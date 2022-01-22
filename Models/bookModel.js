@@ -14,6 +14,7 @@ const bookSchema = new Schema({
   description: String,
   status: String,
   email: String,
+  image: String,
 });
 
 // create a model to export that you will use to make all instances of this collection
