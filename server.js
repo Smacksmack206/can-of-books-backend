@@ -5,13 +5,15 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const Book = require('./Models/bookModel');
+const { send } = require('express/lib/response');
 
 const schema = {Book}
 
 const app = express();
 app.use(cors());
+app.use(express.json());
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 // connecting to the cloud database called cats-database via the connection string in the .env
 mongoose.connect(process.env.DB_URI, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -32,16 +34,10 @@ app.get('/', (request, response) => {
 })
 
 app.get('/books', handleGetBooks);
+app.post('/books', handlePostBooks);
 
 async function handleGetBooks(request, response) {
   try {
-    // an empty object tells us to find all the cats - no specifications
-    // let catsFromDB = await Cat.find({});
-
-    // updated to search for cats with a specific location
-    // let booksFromDB = await Book.find({location: request.query.location});
-
-    //final form
       let queryObj = {};
       if (request.query.status) {
         queryObj = {status: request.query.status}
@@ -59,4 +55,18 @@ async function handleGetBooks(request, response) {
   }
 }
 
+async function handlePostBooks (request, response){
+  // client to send over new book that will match the shape of the BookModel
+  // expect add to db
+  // should come in on the request.body
+  console.log(request.body);
+  try {
+
+    let newBook = await Book.create(request.body)
+    response.status(201).send(newBook);
+  } catch(error){
+    response.status(500).send("Sorry, but your book could not be added. WOMP WOMP");
+  }
+
+}
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
