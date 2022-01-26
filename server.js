@@ -35,14 +35,15 @@ app.get('/', (request, response) => {
 
 app.get('/books', handleGetBooks);
 app.post('/books', handlePostBooks);
+app.delete('/books/:id', handleDeleteBook);
 
 async function handleGetBooks(request, response) {
   try {
       let queryObj = {};
-      if (request.query.status) {
-        queryObj = {status: request.query.status}
+      if (request.query.email) {
+        queryObj = {email: request.query.email}
       }
-      let booksFromDB = await Book.find(queryObj);
+      let booksFromDB = await Book.find((queryObj));
 
     if (booksFromDB) {
       response.status(200).send(booksFromDB);
@@ -64,9 +65,37 @@ async function handlePostBooks (request, response){
 
     let newBook = await Book.create(request.body)
     response.status(201).send(newBook);
+   
   } catch(error){
     response.status(500).send("Sorry, but your book could not be added. WOMP WOMP");
   }
 
+}
+
+async function handleDeleteBook (request, response){
+  
+  
+  
+  try {
+    const id = request.params.id;
+    const email = request.query.email;
+    console.log(id, email);
+
+    const book = await Book.findOne({_id: id, email: email });
+    console.log(book);
+    if(!book){
+      response.status(400).send('unable to delete book');
+      return;
+    }
+
+    if (book.email !== email){
+      response.status(400).send('unable to delete book');
+    }
+    await Book.findByIdAndDelete(id);
+    response.status(202).send('This Books has been Removed!')
+  } catch (error) {
+    console.log(error);
+    response.status(404).send('unable to delete book');
+  }
 }
 app.listen(PORT, () => console.log(`listening on ${PORT}`));

@@ -10,11 +10,11 @@ const { Schema } = mongoose;
 const bookSchema = new Schema({
   // see mongoose for more 'types' of values https://mongoosejs.com/docs/schematypes.html
 
-  title: String,
-  description: String,
-  status: String,
-  email: String,
-  image: String,
+  title: { type: String, required: true },
+  description: { type: String },
+  status: { type: String },
+  email: { type: String, required: true },
+  image: {type: String}
 });
 
 // create a model to export that you will use to make all instances of this collection
