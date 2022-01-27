@@ -88,6 +88,7 @@ async function handleDeleteBook(request, response) {
 
     if (book.email !== email) {
       response.status(400).send('unable to delete book');
+      return;
     }
     await Book.findByIdAndDelete(id);
     response.status(202).send('This Books has been Removed!')
@@ -103,20 +104,23 @@ async function handlePutBooks(request, response) {
     const id = request.params.id;
     const email = request.query.email;
 
-    const bookUpdate = await Book.findOne({ _id: id, email: email });
+    const bookUpdate = await Book.findOne({ _id: id, email: email })
 
     if (!bookUpdate) {
       response.status(404).send('no books for you!');
       return;
     }
-
-    const updatedBook = await Book.findByIdAndUpdate(id, request.body, { new: true });
+    if (bookUpdate.email !== email) {
+      response.status(400).send('unable to update book');
+      return;
+    }
+    const updatedBook = await Book.findByIdAndUpdate(id, request.body, { new: true});
     response.send(updatedBook)
 
   }
   catch (error) {
     console.error(error);
-    response.status(500).send('server error');
+    response.status(500).send('We have a problem');
   }
 }
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
