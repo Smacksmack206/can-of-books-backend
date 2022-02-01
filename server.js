@@ -58,9 +58,7 @@ async function handleGetBooks(request, response) {
 }
 
 async function handlePostBooks(request, response) {
-  // client to send over new book that will match the shape of the BookModel
-  // expect add to db
-  // should come in on the request.body
+
   console.log(request.body);
   try {
 
