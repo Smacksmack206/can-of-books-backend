@@ -6,6 +6,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const Book = require('./Models/bookModel');
 const { send } = require('express/lib/response');
+const verifyUser = require('./auth.js'); 
+
 
 const schema = { Book }
 
@@ -37,8 +39,13 @@ app.get('/books', handleGetBooks);
 app.post('/books', handlePostBooks);
 app.delete('/books/:id', handleDeleteBook);
 app.put('/books/:id', handlePutBooks);
+app.get('/user', handleGetUser);
 
 async function handleGetBooks(request, response) {
+  verifyUser(req, async (err, user) => {
+    if (err) {
+      res.send('invalid token');
+    } else {
   try {
     let queryObj = {};
     if (request.query.email) {
@@ -55,10 +62,15 @@ async function handleGetBooks(request, response) {
     console.error(error);
     response.status(500).send('server error');
   }
+} 
+  })
 }
 
 async function handlePostBooks(request, response) {
-
+  verifyUser(req, async (err, user) => {
+    if (err) {
+      res.send('invalid token');
+    } else {
   console.log(request.body);
   try {
 
@@ -70,8 +82,14 @@ async function handlePostBooks(request, response) {
   }
 
 }
+  })
+}
 
 async function handleDeleteBook(request, response) {
+  verifyUser(req, async (err, user) => {
+    if (err) {
+      res.send('invalid token');
+    } else {
   try {
     const id = request.params.id;
     const email = request.query.email;
@@ -95,9 +113,14 @@ async function handleDeleteBook(request, response) {
     response.status(404).send('unable to delete book');
   }
 }
+  })
+}
 
 async function handlePutBooks(request, response) {
-
+  verifyUser(req, async (err, user) => {
+    if (err) {
+      res.send('invalid token');
+    } else {
   try {
     const id = request.params.id;
     const email = request.query.email;
@@ -121,4 +144,22 @@ async function handlePutBooks(request, response) {
     response.status(500).send('We have a problem');
   }
 }
+  })
+}
+
+// this is a route to verify the user
+function handleGetUser(req, res) {
+  // verifyUser is defined in the auth.js
+  verifyUser(req, (err, user) => {
+    // "error-first" function
+    if (err) {
+      // if there is a problem verifying you
+      res.send('invalid token');
+    } else {
+      // if there is not a problem verifying you
+      res.send(user);
+    }
+  })
+}
+
 app.listen(PORT, () => console.log(`listening on ${PORT}`));
